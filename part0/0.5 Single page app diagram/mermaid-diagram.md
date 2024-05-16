@@ -4,7 +4,7 @@ participant browser
 participant server
 
     Note right of browser: SPAs comprise of only one HTML page fetched from the server.
-    Note left of server: JavaScript (executed in the browser) manipulates this HTML page's contents.
+    Note right of server: JavaScript (executed in the browser) manipulates this HTML page's contents.
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa
     activate server
     server-->>browser: The HTML file
