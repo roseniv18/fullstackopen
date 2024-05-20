@@ -1,18 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import axios from "axios"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 
-const initialPersons = [
-	{ name: "Arto Hellas", number: "040-123456", id: 1 },
-	{ name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-	{ name: "Dan Abramov", number: "12-43-234345", id: 3 },
-	{ name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-]
-
 const App = () => {
-	const [persons, setPersons] = useState(initialPersons)
-	const [filterPersons, setFilterPersons] = useState(initialPersons)
+	const [persons, setPersons] = useState([])
+	const [filterPersons, setFilterPersons] = useState([])
 	const [newInput, setNewInput] = useState({
 		newName: "",
 		newNumber: "",
@@ -51,6 +45,18 @@ const App = () => {
 		)
 		setFilterPersons(filtered)
 	}
+
+	// FETCH DATA FROM JSON-SERVER
+	useEffect(() => {
+		axios.get("http://localhost:3001/persons").then((res) => {
+			if (res.data) {
+				setPersons(res.data)
+				setFilterPersons(res.data)
+			} else {
+				alert("Error fetching data!")
+			}
+		})
+	}, [])
 
 	return (
 		<div>
