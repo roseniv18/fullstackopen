@@ -4,6 +4,9 @@ import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 import phonebookService from "./services/phonebookService"
+import Notification from "./components/Notification"
+
+const ALERT_TIMEOUT = 5000
 
 const App = () => {
 	const [persons, setPersons] = useState([])
@@ -13,6 +16,7 @@ const App = () => {
 		newNumber: "",
 	})
 	const [filterName, setFilterName] = useState("")
+	const [alertMessage, setAlertMessage] = useState(null)
 
 	const handleSubmit = (e) => {
 		e.preventDefault()
@@ -33,37 +37,64 @@ const App = () => {
 		}
 
 		// Create new person
-		phonebookService.create(newPerson).then((res) => {
-			setPersons(persons.concat(res.data))
-			setFilterPersons(filterPersons.concat(res.data))
-			setNewInput({ newName: "", newNumber: "" })
-		})
+		phonebookService
+			.create(newPerson)
+			.then((res) => {
+				setPersons(persons.concat(res.data))
+				setFilterPersons(filterPersons.concat(res.data))
+				setNewInput({ newName: "", newNumber: "" })
+				handleAlertDisplay(
+					{ type: "success", message: "User successfully created!" },
+					ALERT_TIMEOUT
+				)
+			})
+			.catch((err) => handleAlertDisplay({ type: "error", message: err.message }, ALERT_TIMEOUT))
 	}
 
 	// Delete person
 	const handleDelete = (id) => {
 		const nameOfPerson = persons.find((p) => p.id === id).name
 		if (window.confirm(`Delete the user ${nameOfPerson}?`)) {
-			phonebookService.remove(id).then(() => {
-				setPersons((prevPersons) => prevPersons.filter((p) => p.id !== id))
-				setFilterPersons((prevPersons) => prevPersons.filter((p) => p.id !== id))
-				setNewInput({ newName: "", newNumber: "" })
-			})
+			phonebookService
+				.remove(id)
+				.then(() => {
+					setPersons((prevPersons) => prevPersons.filter((p) => p.id !== id))
+					setFilterPersons((prevPersons) => prevPersons.filter((p) => p.id !== id))
+					setNewInput({ newName: "", newNumber: "" })
+					handleAlertDisplay(
+						{ type: "success", message: `User ${nameOfPerson} was successfully deleted!` },
+						ALERT_TIMEOUT
+					)
+				})
+				.catch((err) => {
+					handleAlertDisplay({ type: "error", message: err.message }, ALERT_TIMEOUT)
+				})
 		}
 	}
 
 	// Update person (with PUT method)
-	const handleUpdate = (id, newPerson) => {
-		console.log(id, newPerson)
-		phonebookService.update(id, newPerson).then(() => {
-			// Create new updatedPersons array with updated number of person with specified id.
-			const updatedPersons = persons.map((person) =>
-				person.id === id ? { ...person, number: newPerson.number } : person
-			)
-			setPersons(updatedPersons)
-			setFilterPersons(updatedPersons)
-			setNewInput({ newName: "", newNumber: "" })
-		})
+	const handleUpdate = (id, updatedPerson) => {
+		phonebookService
+			.update(id, updatedPerson)
+			.then(() => {
+				// Create new updatedPersons array with updated number of person with specified id.
+				const updatedPersons = persons.map((person) =>
+					person.id === id ? { ...person, number: updatedPerson.number } : person
+				)
+				setPersons(updatedPersons)
+				setFilterPersons(updatedPersons)
+				setNewInput({ newName: "", newNumber: "" })
+				handleAlertDisplay(
+					{
+						type: "success",
+						message: `Phone number of ${updatedPerson.name} successfully updated!`,
+					},
+					ALERT_TIMEOUT
+				)
+			})
+			.catch((err) => {
+				handleAlertDisplay({ type: "error", message: err.message }, ALERT_TIMEOUT)
+			})
 	}
 
 	// Dynamically handle multiple input fields
@@ -82,14 +113,18 @@ const App = () => {
 		setFilterPersons(filtered)
 	}
 
+	// Display an alert message and clear it after given timeout.
+	const handleAlertDisplay = (newAlert, timeout) => {
+		setAlertMessage(newAlert)
+		setTimeout(() => setAlertMessage(null), timeout)
+	}
+
 	// FETCH DATA FROM JSON-SERVER
 	useEffect(() => {
 		axios.get("http://localhost:3001/persons").then((res) => {
 			if (res.data) {
 				setPersons(res.data)
 				setFilterPersons(res.data)
-			} else {
-				alert("Error fetching data!")
 			}
 		})
 	}, [])
@@ -97,6 +132,11 @@ const App = () => {
 	return (
 		<div>
 			<h2>Phonebook</h2>
+			{alertMessage ? (
+				<Notification type={alertMessage.type} message={alertMessage.message} />
+			) : (
+				<></>
+			)}
 			<Filter filterName={filterName} handleFilterNameChange={handleFilterNameChange} />
 
 			<h2>Add New</h2>
