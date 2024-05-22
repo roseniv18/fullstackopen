@@ -3,6 +3,7 @@ import axios from "axios"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
+import phonebookService from "./services/phonebookService"
 
 const App = () => {
 	const [persons, setPersons] = useState([])
@@ -17,17 +18,52 @@ const App = () => {
 		e.preventDefault()
 		const { newName, newNumber } = newInput
 
+		const newPerson = {
+			name: newName,
+			number: newNumber,
+		}
+
 		// Check if person already exists in phonebook
-		if (persons.find((person) => person.name === newName)) {
-			alert(`${newName} is already added to the phonebook!`)
+		const personExists = persons.find((person) => person.name === newName)
+		if (personExists) {
+			if (window.confirm(`${newName} already exists! Replace the old number with a new one?`)) {
+				handleUpdate(personExists.id, { ...personExists, number: newNumber })
+			}
 			return
 		}
 
-		// Add person
-		setPersons((prevPersons) => [...prevPersons, { name: newName, number: newNumber }])
-		setFilterPersons((prevPersons) => [...prevPersons, { name: newName, number: newNumber }])
-		// Clear inputs
-		setNewInput({ newName: "", newNumber: "" })
+		// Create new person
+		phonebookService.create(newPerson).then((res) => {
+			setPersons(persons.concat(res.data))
+			setFilterPersons(filterPersons.concat(res.data))
+			setNewInput({ newName: "", newNumber: "" })
+		})
+	}
+
+	// Delete person
+	const handleDelete = (id) => {
+		const nameOfPerson = persons.find((p) => p.id === id).name
+		if (window.confirm(`Delete the user ${nameOfPerson}?`)) {
+			phonebookService.remove(id).then(() => {
+				setPersons((prevPersons) => prevPersons.filter((p) => p.id !== id))
+				setFilterPersons((prevPersons) => prevPersons.filter((p) => p.id !== id))
+				setNewInput({ newName: "", newNumber: "" })
+			})
+		}
+	}
+
+	// Update person (with PUT method)
+	const handleUpdate = (id, newPerson) => {
+		console.log(id, newPerson)
+		phonebookService.update(id, newPerson).then(() => {
+			// Create new updatedPersons array with updated number of person with specified id.
+			const updatedPersons = persons.map((person) =>
+				person.id === id ? { ...person, number: newPerson.number } : person
+			)
+			setPersons(updatedPersons)
+			setFilterPersons(updatedPersons)
+			setNewInput({ newName: "", newNumber: "" })
+		})
 	}
 
 	// Dynamically handle multiple input fields
@@ -72,7 +108,7 @@ const App = () => {
 
 			<h2>Numbers</h2>
 			<ul>
-				<Persons persons={filterPersons} />
+				<Persons persons={filterPersons} handleDelete={handleDelete} />
 			</ul>
 			<div>debug newName: {newInput.newName}</div>
 			<div>debug newNumber: {newInput.newNumber}</div>
