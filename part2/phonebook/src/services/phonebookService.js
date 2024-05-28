@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const SERVER_URL = "http://localhost:3001"
+const SERVER_URL = "https://phonebook-backend-qudd.onrender.com"
 
 const create = async (newPerson) => {
 	if (!newPerson.name || !newPerson.number) {

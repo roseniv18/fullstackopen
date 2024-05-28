@@ -7,7 +7,7 @@ import phonebookService from "./services/phonebookService"
 import Notification from "./components/Notification"
 
 const ALERT_TIMEOUT = 5000
-const BASE_URL = "http://localhost:3001"
+const BASE_URL = "https://phonebook-backend-qudd.onrender.com"
 
 const App = () => {
 	const [persons, setPersons] = useState([])
