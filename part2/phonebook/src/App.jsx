@@ -151,9 +151,6 @@ const App = () => {
 			<ul>
 				<Persons persons={filterPersons} handleDelete={handleDelete} />
 			</ul>
-			<div>debug newName: {newInput.newName}</div>
-			<div>debug newNumber: {newInput.newNumber}</div>
-			<div>debug filterName: {filterName}</div>
 		</div>
 	)
 }
