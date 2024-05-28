@@ -11,6 +11,7 @@ morgan.token("returndata", (req, res) => {
 // MIDDLEWARE
 app.use(cors())
 app.use(express.json())
+app.use(express.static("dist"))
 app.use(morgan(":method :url :status - :total-time[3] ms :returndata"))
 
 const PORT = 3001
