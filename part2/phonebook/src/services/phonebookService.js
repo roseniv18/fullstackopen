@@ -6,12 +6,12 @@ const create = async (newPerson) => {
 	if (!newPerson.name || !newPerson.number) {
 		throw new Error("Please fill out all fields!")
 	}
-	return axios.post(`${SERVER_URL}/persons`, newPerson).then((res) => res)
+	return axios.post(`${SERVER_URL}/api/persons`, newPerson).then((res) => res)
 }
 
 const remove = async (id) => {
 	return axios
-		.delete(`${SERVER_URL}/persons/${id}`)
+		.delete(`${SERVER_URL}/api/persons/${id}`)
 		.then((res) => res)
 		.catch((err) => {
 			if (err.response.status === 404) {
@@ -24,7 +24,7 @@ const remove = async (id) => {
 
 const update = async (id, updatedPerson) => {
 	return axios
-		.put(`${SERVER_URL}/persons/${id}`, updatedPerson)
+		.put(`${SERVER_URL}/api/persons/${id}`, updatedPerson)
 		.then((res) => res)
 		.catch((err) => {
 			if (err.response.status === 404) {

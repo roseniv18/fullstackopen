@@ -7,6 +7,7 @@ import phonebookService from "./services/phonebookService"
 import Notification from "./components/Notification"
 
 const ALERT_TIMEOUT = 5000
+const BASE_URL = "http://localhost:3001"
 
 const App = () => {
 	const [persons, setPersons] = useState([])
@@ -121,7 +122,7 @@ const App = () => {
 
 	// FETCH DATA FROM JSON-SERVER
 	useEffect(() => {
-		axios.get("http://localhost:3001/persons").then((res) => {
+		axios.get(`${BASE_URL}/api/persons`).then((res) => {
 			if (res.data) {
 				setPersons(res.data)
 				setFilterPersons(res.data)
