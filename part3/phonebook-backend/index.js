@@ -51,19 +51,19 @@ app.post("/api/persons", (req, res) => {
 	// Check if body contains name and number
 	if (body.name && body.number) {
 		// Check if person already exists - if yes send an error message
-		const personExists = Person.find({ name: body.name })
-		if (personExists) {
-			res.status(400).json({ error: "person already exists" })
-		} else {
-			const person = new Person({
-				name: body.name,
-				number: body.number.toString(),
-			})
-			person
-				.save()
-				.then(() => res.status(201).json(person))
-				.catch((err) => res.status(500).json({ error: err.message }))
-		}
+		// const personExists = Person.find({ name: body.name })
+		// if (personExists) {
+		// res.status(400).json({ error: "person already exists" })
+		// } else {
+		const person = new Person({
+			name: body.name,
+			number: body.number.toString(),
+		})
+		person
+			.save()
+			.then(() => res.status(201).json(person))
+			.catch((err) => res.status(500).json({ error: err.message }))
+		// }
 	} else {
 		res.status(400).json({ error: "please provide name and number" })
 	}
