@@ -2,7 +2,15 @@ require("dotenv").config()
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
-const { getAll, getById, getInfo, createPerson, deletePerson } = require("./requests/requests")
+const {
+	getAll,
+	getById,
+	getInfo,
+	createPerson,
+	deletePerson,
+	updatePerson,
+} = require("./requests/requests")
+const { errorHandler } = require("./middleware/errorHandler")
 
 const app = express()
 
@@ -23,6 +31,9 @@ app.get(`/api/persons`, getAll)
 app.get("/api/persons/:id", getById)
 app.get("/info", getInfo)
 app.post("/api/persons", createPerson)
+app.put("/api/persons/:id", updatePerson)
 app.delete("/api/persons/:id", deletePerson)
+
+app.use(errorHandler)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

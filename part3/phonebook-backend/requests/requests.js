@@ -5,7 +5,7 @@ const getAll = async (req, res) => {
 	res.status(200).json(persons)
 }
 
-const getById = async (req, res) => {
+const getById = async (req, res, next) => {
 	try {
 		await Person.findById(req.params.id).then((person) => {
 			if (person) {
@@ -15,6 +15,7 @@ const getById = async (req, res) => {
 			}
 		})
 	} catch (error) {
+		next(error)
 		res.status(500).json({ error: `Server Error - ${error.message}` })
 	}
 }
@@ -54,6 +55,21 @@ const createPerson = async (req, res) => {
 	}
 }
 
+const updatePerson = async (req, res) => {
+	try {
+		const personExists = await Person.find({ name: req.body.name })
+
+		if (!personExists && personExists.length === 0) {
+			res.status(404).json({ error: "Person not found" })
+		}
+
+		await Person.findByIdAndUpdate(req.params.id, { number: req.body.number })
+		res.status(200).json({ message: "Successfully modified number" })
+	} catch (error) {
+		res.status(500).json({ error: `Server Error: ${error.message}` })
+	}
+}
+
 const deletePerson = async (req, res) => {
 	try {
 		await Person.deleteOne({ _id: req.params.id })
@@ -63,4 +79,4 @@ const deletePerson = async (req, res) => {
 	}
 }
 
-module.exports = { getAll, getById, getInfo, createPerson, deletePerson }
+module.exports = { getAll, getById, getInfo, createPerson, updatePerson, deletePerson }
